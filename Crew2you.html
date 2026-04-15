@@ -1,0 +1,2568 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crew2you — Bokningssystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Neutral base — warm off-white */
+    --bg: #faf8f3;
+    --surface: #ffffff;
+    --surface-alt: #f5f2ea;
+    --border: #e8e2d4;
+    --border-strong: #d4cdb8;
+
+    /* Text — warm dark ink */
+    --ink: #1c1a15;
+    --ink-soft: #3d3930;
+    --ink-muted: #6b6656;
+    --ink-faint: #9c9581;
+
+    /* Gold — Crew2you brand */
+    --gold: #c4a758;
+    --gold-dark: #a88c42;
+    --gold-light: #e8dcb8;
+    --gold-bg: #faf4e3;
+
+    /* Status colors — muted, professional */
+    --blue: #4c6ef5;
+    --blue-bg: #eef2ff;
+    --violet: #7c3aed;
+    --violet-bg: #f3efff;
+    --pink: #db2777;
+    --pink-bg: #fdf2f8;
+    --amber: #d97706;
+    --amber-bg: #fef7e6;
+    --green: #059669;
+    --green-bg: #ecfdf5;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --slate: #475569;
+    --slate-bg: #f1f5f9;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(28, 26, 21, 0.04);
+    --shadow-sm: 0 1px 3px rgba(28, 26, 21, 0.06), 0 1px 2px rgba(28, 26, 21, 0.04);
+    --shadow-md: 0 4px 12px rgba(28, 26, 21, 0.06), 0 2px 4px rgba(28, 26, 21, 0.04);
+    --shadow-lg: 0 20px 40px rgba(28, 26, 21, 0.12), 0 4px 12px rgba(28, 26, 21, 0.06);
+
+    /* Radii */
+    --r-sm: 6px;
+    --r: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.005em;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font-family: inherit; font-size: 14px; color: var(--ink); }
+  svg { flex-shrink: 0; }
+  .icon { width: 18px; height: 18px; stroke-width: 1.75; }
+  .icon-sm { width: 14px; height: 14px; stroke-width: 2; }
+  .icon-lg { width: 22px; height: 22px; stroke-width: 1.75; }
+
+  /* ============ LOGIN ============ */
+  .login-screen {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(196, 167, 88, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(196, 167, 88, 0.05) 0%, transparent 50%),
+      var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-card {
+    background: var(--surface);
+    border-radius: var(--r-xl);
+    padding: 56px 48px 48px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid var(--gold-light);
+  }
+  .login-logo {
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: center;
+  }
+  .login-logo img { max-height: 90px; width: auto; }
+  .login-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .login-sub {
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+    font-size: 15px;
+    text-align: center;
+  }
+  .role-grid { display: grid; gap: 10px; }
+  .role-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 18px 20px;
+    text-align: left;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .role-btn:hover {
+    border-color: var(--gold);
+    background: var(--gold-bg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .role-icon-wrap {
+    width: 42px; height: 42px;
+    border-radius: var(--r);
+    background: var(--ink);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .role-btn[data-role="personal"] .role-icon-wrap { background: var(--gold); color: white; }
+  .role-btn[data-role="kund"] .role-icon-wrap { background: var(--green); color: white; }
+  .role-info h4 { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .role-info p { font-size: 13px; color: var(--ink-muted); }
+  .role-arrow { margin-left: auto; color: var(--ink-faint); transition: transform 0.15s; }
+  .role-btn:hover .role-arrow { transform: translateX(3px); color: var(--gold-dark); }
+
+  /* ============ APP SHELL ============ */
+  .app { display: none; min-height: 100vh; }
+  .app.active { display: flex; }
+
+  .sidebar {
+    width: 248px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .sidebar-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+  }
+  .sidebar-logo img { max-height: 54px; width: auto; }
+  .sidebar-role {
+    padding: 14px 24px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-faint);
+  }
+  .sidebar-role strong { color: var(--gold-dark); font-weight: 700; }
+  .sidebar-nav { flex: 1; padding: 4px 12px 12px; overflow-y: auto; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    border-radius: var(--r);
+    transition: all 0.12s ease;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--surface-alt); color: var(--ink); }
+  .nav-item.active {
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    font-weight: 600;
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 8px; bottom: 8px;
+    width: 3px;
+    background: var(--gold);
+    border-radius: 0 3px 3px 0;
+  }
+  .nav-item .icon { color: currentColor; }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .switch-role-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface-alt);
+    color: var(--ink-soft);
+    border-radius: var(--r);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+  }
+  .switch-role-btn:hover { background: var(--border); color: var(--ink); }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    background: var(--surface);
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .page-sub { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .content { flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+  /* ============ BUTTONS ============ */
+  .btn {
+    padding: 9px 16px;
+    border-radius: var(--r);
+    font-weight: 600;
+    font-size: 13.5px;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary:hover { background: var(--ink-soft); }
+  .btn-accent { background: var(--gold); color: white; }
+  .btn-accent:hover { background: var(--gold-dark); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); }
+  .btn-ghost:hover { background: var(--surface-alt); color: var(--ink); }
+  .btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--border-strong); }
+  .btn-outline:hover { border-color: var(--ink); background: var(--surface-alt); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { background: #b91c1c; }
+
+  /* ============ KPI / CARDS ============ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    padding: 22px 22px 20px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s;
+  }
+  .kpi-card:hover { border-color: var(--border-strong); }
+  .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .kpi-label { font-size: 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+  .kpi-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--r-sm);
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .kpi-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .kpi-value small { font-size: 18px; color: var(--ink-muted); font-weight: 500; }
+  .kpi-change { font-size: 12px; margin-top: 6px; font-weight: 500; color: var(--ink-muted); display: flex; align-items: center; gap: 4px; }
+  .kpi-change.up { color: var(--green); }
+  .kpi-change.warn { color: var(--amber); }
+  .kpi-change.danger { color: var(--red); }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .card-body { padding: 22px; }
+
+  /* ============ PIPELINE ============ */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(260px, 1fr));
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
+  .pipeline-col {
+    background: var(--surface-alt);
+    border-radius: var(--r-lg);
+    padding: 12px;
+    min-height: 420px;
+    border: 1px solid var(--border);
+  }
+  .pipeline-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 4px 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pipeline-head h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stage-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .pipeline-count {
+    background: var(--surface);
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+  }
+
+  .booking-card {
+    background: var(--surface);
+    border-radius: var(--r);
+    padding: 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .booking-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .bc-butik { font-weight: 600; color: var(--ink); font-size: 13.5px; line-height: 1.35; }
+  .bc-ort { font-size: 11.5px; color: var(--ink-muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .bc-kund { font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; font-weight: 500; padding-top: 8px; border-top: 1px solid var(--surface-alt); }
+  .bc-meta { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .bc-person { font-size: 11.5px; color: var(--ink-muted); margin-top: 8px; display: flex; align-items: center; gap: 5px; }
+  .bc-person.missing { color: var(--red); font-weight: 500; }
+
+  /* ============ CHIPS / BADGES ============ */
+  .chip {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--surface-alt);
+    color: var(--ink-soft);
+    font-weight: 500;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .chip.demo { background: var(--blue-bg); color: var(--blue); border-color: transparent; }
+  .chip.plock { background: var(--violet-bg); color: var(--violet); border-color: transparent; }
+  .chip.sampling { background: var(--pink-bg); color: var(--pink); border-color: transparent; }
+  .chip.event { background: var(--amber-bg); color: var(--amber); border-color: transparent; }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+  }
+  .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status-inkommen { background: var(--slate-bg); color: var(--slate); }
+  .status-bokad { background: var(--blue-bg); color: var(--blue); }
+  .status-bekraftad { background: var(--violet-bg); color: var(--violet); }
+  .status-personal { background: var(--pink-bg); color: var(--pink); }
+  .status-genomford { background: var(--amber-bg); color: var(--amber); }
+  .status-aterrapporterad { background: var(--green-bg); color: var(--green); }
+  .status-fakturerad { background: var(--gold-bg); color: var(--gold-dark); }
+
+  /* ============ TABLE ============ */
+  .table-wrap { overflow-x: auto; }
+  table.data { width: 100%; border-collapse: collapse; }
+  table.data th {
+    text-align: left;
+    padding: 12px 18px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-alt);
+    white-space: nowrap;
+  }
+  table.data td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  table.data tr:hover td { background: var(--surface-alt); }
+  table.data tr:last-child td { border-bottom: none; }
+  .td-muted { color: var(--ink-muted); }
+  .td-strong { font-weight: 600; color: var(--ink); }
+
+  /* ============ FILTERS ============ */
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-box {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+    max-width: 380px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 9px 12px 9px 38px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r);
+    background: var(--surface);
+    transition: border-color 0.15s;
+  }
+  .search-box input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-bg); }
+  .search-box svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    width: 16px;
+    height: 16px;
+  }
+  .filter-select {
+    padding: 9px 32px 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r);
+    background: var(--surface);
+    font-size: 13.5px;
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6656' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .filter-select:focus { outline: none; border-color: var(--gold); }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 26, 21, 0.45);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    animation: fadeIn 0.15s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--r-xl);
+    max-width: 760px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    padding: 22px 26px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .modal-header h3 { font-size: 19px; font-weight: 700; color: var(--ink); letter-spacing: -0.015em; }
+  .modal-header .sub { font-size: 13px; color: var(--ink-muted); margin-top: 3px; }
+  .close-btn {
+    width: 34px; height: 34px;
+    border-radius: var(--r);
+    background: var(--surface-alt);
+    color: var(--ink-muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+  .close-btn:hover { background: var(--border); color: var(--ink); }
+  .modal-body { padding: 24px 26px; }
+  .modal-footer {
+    padding: 16px 26px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface-alt);
+  }
+
+  /* ============ FORM ============ */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 7px;
+    letter-spacing: 0.1px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r);
+    background: var(--surface);
+    transition: all 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-bg);
+  }
+  .field textarea { min-height: 80px; resize: vertical; }
+  .field-hint { font-size: 11.5px; color: var(--ink-muted); margin-top: 5px; }
+
+  /* Read-only detail display */
+  .detail-value {
+    padding: 10px 12px;
+    background: var(--surface-alt);
+    border-radius: var(--r);
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+    color: var(--ink);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+  }
+  .detail-value.multi { display: block; }
+  .detail-value .muted { color: var(--ink-muted); font-size: 12px; }
+
+  /* ============ STAGE PROGRESS ============ */
+  .stage-track {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    padding: 4px;
+    background: var(--surface-alt);
+    border-radius: var(--r);
+  }
+  .stage-step {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: var(--r-sm);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .stage-step.done { color: var(--green); background: var(--green-bg); }
+  .stage-step.current { color: white; background: var(--ink); }
+  .stage-step.upcoming { opacity: 0.5; }
+
+  /* ============ PERSONAL MOBILE ============ */
+  .mobile-view {
+    max-width: 440px;
+    margin: 24px auto;
+    background: var(--surface);
+    min-height: calc(100vh - 48px);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    padding-bottom: 24px;
+  }
+  .mobile-header {
+    background: var(--ink);
+    color: white;
+    padding: 22px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .m-greeting { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+  .m-name { font-size: 17px; font-weight: 600; margin-top: 2px; letter-spacing: -0.01em; }
+  .m-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .m-head-actions { display: flex; gap: 8px; align-items: center; }
+  .m-switch {
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-radius: var(--r-sm);
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .m-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .m-tab {
+    flex: 1;
+    padding: 14px 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .m-tab.active { color: var(--ink); border-bottom-color: var(--gold); }
+  .m-content { padding: 18px; }
+  .m-uppdrag-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-xs);
+  }
+  .m-date-chip {
+    background: var(--ink);
+    color: var(--gold);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 10px;
+    letter-spacing: 0.2px;
+  }
+  .m-uppdrag-butik { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .m-uppdrag-ort {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .m-uppdrag-info {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .m-uppdrag-info div { margin-bottom: 5px; display: flex; gap: 6px; }
+  .m-uppdrag-info strong { color: var(--ink-muted); font-weight: 600; min-width: 72px; flex-shrink: 0; }
+  .m-uppdrag-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .m-uppdrag-actions .btn { flex: 1; justify-content: center; }
+
+  .utlagg-total-card {
+    background: var(--ink);
+    color: white;
+    padding: 20px;
+    border-radius: var(--r-lg);
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .utlagg-total-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(196, 167, 88, 0.2) 0%, transparent 70%);
+  }
+  .utlagg-total-card .label { font-size: 12px; opacity: 0.7; font-weight: 500; }
+  .utlagg-total-card .value { font-size: 32px; font-weight: 700; color: var(--gold); letter-spacing: -0.02em; margin-top: 4px; }
+  .utlagg-total-card .sub { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+  .utlagg-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .utlagg-item-info h5 { font-size: 13.5px; color: var(--ink); font-weight: 600; }
+  .utlagg-item-info p { font-size: 11.5px; color: var(--ink-muted); margin-top: 3px; }
+  .utlagg-amount { font-weight: 700; color: var(--ink); }
+
+  /* ============ INVOICE ============ */
+  .invoice-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+  .invoice-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .invoice-row.total {
+    border-top: 1px solid var(--border-strong);
+    margin-top: 10px;
+    padding-top: 14px;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .invoice-row.total span:last-child { color: var(--gold-dark); }
+
+  /* ============ CUSTOMER PORTAL ============ */
+  .kund-hero {
+    background:
+      linear-gradient(135deg, var(--ink) 0%, #2a2520 100%);
+    color: white;
+    padding: 36px 32px;
+    border-radius: var(--r-xl);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kund-hero::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -10%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(196, 167, 88, 0.25) 0%, transparent 70%);
+  }
+  .kund-hero h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .kund-hero p { opacity: 0.8; font-size: 14.5px; max-width: 500px; }
+
+  /* ============ MISC ============ */
+  .empty { padding: 48px; text-align: center; color: var(--ink-muted); }
+  .empty svg { margin: 0 auto 12px; color: var(--ink-faint); }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .sidebar { width: 72px; }
+    .sidebar-logo img { max-height: 36px; }
+    .sidebar-role, .nav-item span:not(.icon), .switch-role-btn span { display: none; }
+    .nav-item { justify-content: center; padding: 10px; }
+    .nav-item.active::before { left: -6px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .content { padding: 20px; }
+    .topbar { padding: 16px 20px; }
+  }
+  @media (max-width: 640px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Scrollbar refinement */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+  /* ============ AUTOMATIONS ============ */
+  .autoflow-hero {
+    background: linear-gradient(135deg, var(--ink) 0%, #2a2520 100%);
+    color: white;
+    padding: 28px 32px;
+    border-radius: var(--r-xl);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .autoflow-hero::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -5%;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(196, 167, 88, 0.3) 0%, transparent 65%);
+  }
+  .autoflow-hero-text { position: relative; z-index: 1; max-width: 540px; }
+  .autoflow-hero h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .autoflow-hero h2 .brand-mark {
+    background: var(--gold);
+    color: var(--ink);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .autoflow-hero p { opacity: 0.8; font-size: 14px; line-height: 1.5; }
+  .autoflow-hero-stat {
+    position: relative; z-index: 1;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .autoflow-hero-stat .num {
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .autoflow-hero-stat .lbl { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+  .automation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .automation-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 20px;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .automation-card:hover { border-color: var(--gold); box-shadow: var(--shadow-sm); }
+  .automation-card.off { opacity: 0.55; }
+  .automation-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .automation-icon {
+    width: 38px; height: 38px;
+    border-radius: var(--r);
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .automation-card.off .automation-icon { background: var(--surface-alt); color: var(--ink-faint); }
+  .automation-title { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.005em; margin-bottom: 2px; }
+  .automation-desc { font-size: 12.5px; color: var(--ink-muted); line-height: 1.5; }
+
+  /* Flow visualization */
+  .flow-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    background: var(--surface-alt);
+    padding: 7px 10px;
+    border-radius: var(--r-sm);
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+  .flow-pill .arrow { color: var(--ink-faint); font-weight: 700; }
+  .flow-pill .trigger { color: var(--violet); font-weight: 600; }
+  .flow-pill .action { color: var(--green); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+
+  .automation-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    align-items: center;
+  }
+  .automation-stat-text { font-size: 11.5px; color: var(--ink-muted); }
+  .automation-stat-text strong { color: var(--ink); font-weight: 600; }
+
+  /* Toggle switch */
+  .toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    background: var(--border-strong);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle.on { background: var(--gold); }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* Activity log */
+  .activity-timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+  .activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--border);
+  }
+  .activity-item {
+    position: relative;
+    padding: 10px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .activity-dot {
+    position: absolute;
+    left: -20px;
+    top: 14px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--gold);
+  }
+  .activity-item.muted .activity-dot { background: var(--border-strong); box-shadow: 0 0 0 1px var(--border-strong); }
+  .activity-content { flex: 1; }
+  .activity-main { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .activity-meta { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+  .activity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    font-weight: 600;
+  }
+
+  /* ============ TOAST NOTIFICATIONS ============ */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+  }
+  .toast {
+    background: var(--ink);
+    color: white;
+    padding: 14px 18px;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: toastSlideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid var(--gold);
+    min-width: 280px;
+  }
+  @keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .toast.removing { animation: toastSlideOut 0.2s ease forwards; }
+  @keyframes toastSlideOut {
+    to { transform: translateX(120%); opacity: 0; }
+  }
+  .toast-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--r-sm);
+    background: rgba(196, 167, 88, 0.15);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .toast-body { flex: 1; }
+  .toast-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .toast-msg { font-size: 12.5px; opacity: 0.85; line-height: 1.45; }
+  .toast-close {
+    color: rgba(255,255,255,0.5);
+    padding: 2px;
+  }
+  .toast-close:hover { color: white; }
+
+  /* Run-log table */
+  .run-row-new {
+    animation: flashNew 1.5s ease;
+  }
+  @keyframes flashNew {
+    0%, 20% { background: var(--gold-bg); }
+    100% { background: transparent; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ ICON DEFINITIONS (reused via <use>) ============ -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <symbol id="i-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol>
+    <symbol id="i-pipeline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="6" height="20" x="4" y="2" rx="2"/><rect width="6" height="14" x="14" y="2" rx="2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v8h4M18 9h2a2 2 0 0 1 2 2v11h-4"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 17.5v-11"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-user-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="7" cy="7" r="4"/><path d="M17 12v4M17 19v.01"/></symbol>
+    <symbol id="i-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+    <symbol id="i-trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-message-square" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div style="text-align:center;">
+      <div class="demo-badge">
+        <svg class="icon-sm"><use href="#i-check"/></svg>
+        Demo byggd av Samify
+      </div>
+    </div>
+    <div class="login-logo" id="loginLogoSlot"></div>
+    <div class="login-title">Bokningssystem</div>
+    <p class="login-sub">Välj roll för att testa demot — växla fritt mellan vyerna.</p>
+    <div class="role-grid">
+      <button class="role-btn" data-role="admin" onclick="login('admin')">
+        <div class="role-icon-wrap"><svg class="icon"><use href="#i-dashboard"/></svg></div>
+        <div class="role-info">
+          <h4>Admin / Kontor</h4>
+          <p>Pipeline, bokningar, fakturaunderlag, register</p>
+        </div>
+        <svg class="icon role-arrow"><use href="#i-arrow-right"/></svg>
+      </button>
+      <button class="role-btn" data-role="personal" onclick="login('personal')">
+        <div class="role-icon-wrap"><svg class="icon"><use href="#i-user"/></svg></div>
+        <div class="role-info">
+          <h4>Personal / Demovärd</h4>
+          <p>Mobilvy: mina uppdrag, utlägg, återrapport</p>
+        </div>
+        <svg class="icon role-arrow"><use href="#i-arrow-right"/></svg>
+      </button>
+      <button class="role-btn" data-role="kund" onclick="login('kund')">
+        <div class="role-icon-wrap"><svg class="icon"><use href="#i-building"/></svg></div>
+        <div class="role-info">
+          <h4>Kund / Uppdragsgivare</h4>
+          <p>Mina bokningar, återrapporter, foton</p>
+        </div>
+        <svg class="icon role-arrow"><use href="#i-arrow-right"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN APP ============ -->
+<div class="app" id="adminApp">
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo" id="sbLogo1"></div></div>
+    <div class="sidebar-role">Inloggad som <strong>Admin</strong></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="dashboard" onclick="setView('dashboard')">
+        <svg class="icon"><use href="#i-dashboard"/></svg><span>Översikt</span>
+      </button>
+      <button class="nav-item" data-view="pipeline" onclick="setView('pipeline')">
+        <svg class="icon"><use href="#i-pipeline"/></svg><span>Pipeline</span>
+      </button>
+      <button class="nav-item" data-view="bokningar" onclick="setView('bokningar')">
+        <svg class="icon"><use href="#i-calendar"/></svg><span>Bokningar</span>
+      </button>
+      <button class="nav-item" data-view="personal" onclick="setView('personal')">
+        <svg class="icon"><use href="#i-users"/></svg><span>Personal</span>
+      </button>
+      <button class="nav-item" data-view="kunder" onclick="setView('kunder')">
+        <svg class="icon"><use href="#i-building"/></svg><span>Kunder & butiker</span>
+      </button>
+      <button class="nav-item" data-view="fakturor" onclick="setView('fakturor')">
+        <svg class="icon"><use href="#i-receipt"/></svg><span>Fakturaunderlag</span>
+      </button>
+      <button class="nav-item" data-view="lon" onclick="setView('lon')">
+        <svg class="icon"><use href="#i-wallet"/></svg><span>Löneunderlag</span>
+      </button>
+      <div style="margin:12px 12px 8px; border-top:1px solid var(--border);"></div>
+      <button class="nav-item" data-view="automations" onclick="setView('automations')">
+        <svg class="icon"><use href="#i-zap"/></svg><span>Automationer</span>
+        <span style="margin-left:auto; background:var(--gold); color:white; font-size:10px; padding:2px 7px; border-radius:10px; font-weight:700; letter-spacing:0.3px;">AUTOFLOW</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="switch-role-btn" onclick="logout()">
+        <svg class="icon-sm"><use href="#i-log-out"/></svg><span>Byt roll</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-title" id="pageTitle">Översikt</div>
+        <div class="page-sub" id="pageSub">Vad händer i Crew2you idag</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="exportData()">
+          <svg class="icon-sm"><use href="#i-download"/></svg> Exportera
+        </button>
+        <button class="btn btn-accent" onclick="openBookingModal()">
+          <svg class="icon-sm"><use href="#i-plus"/></svg> Nytt uppdrag
+        </button>
+      </div>
+    </header>
+    <div class="content" id="adminContent"></div>
+  </main>
+</div>
+
+<!-- ============ PERSONAL APP ============ -->
+<div class="app" id="personalApp" style="background:var(--bg);">
+  <div class="mobile-view">
+    <header class="mobile-header">
+      <div>
+        <div class="m-greeting">God morgon</div>
+        <div class="m-name">Lars Djupsjö</div>
+      </div>
+      <div class="m-head-actions">
+        <button class="m-switch" onclick="logout()">
+          <svg class="icon-sm"><use href="#i-log-out"/></svg>Byt
+        </button>
+        <div class="m-avatar">LD</div>
+      </div>
+    </header>
+    <div class="m-tabs">
+      <button class="m-tab active" data-mtab="uppdrag" onclick="setMobileTab('uppdrag')">Uppdrag</button>
+      <button class="m-tab" data-mtab="utlagg" onclick="setMobileTab('utlagg')">Utlägg</button>
+      <button class="m-tab" data-mtab="aterrapport" onclick="setMobileTab('aterrapport')">Återrapport</button>
+    </div>
+    <div class="m-content" id="mobileContent"></div>
+  </div>
+</div>
+
+<!-- ============ CUSTOMER APP ============ -->
+<div class="app" id="kundApp">
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo" id="sbLogo2"></div></div>
+    <div class="sidebar-role">Inloggad som <strong>Falbygdens Ost</strong></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="kund-oversikt" onclick="setKundView('oversikt')">
+        <svg class="icon"><use href="#i-home"/></svg><span>Översikt</span>
+      </button>
+      <button class="nav-item" data-view="kund-bokningar" onclick="setKundView('bokningar')">
+        <svg class="icon"><use href="#i-calendar"/></svg><span>Mina bokningar</span>
+      </button>
+      <button class="nav-item" data-view="kund-rapporter" onclick="setKundView('rapporter')">
+        <svg class="icon"><use href="#i-clipboard"/></svg><span>Återrapporter</span>
+      </button>
+      <button class="nav-item" data-view="kund-fakturor" onclick="setKundView('fakturor')">
+        <svg class="icon"><use href="#i-receipt"/></svg><span>Fakturor</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="switch-role-btn" onclick="logout()">
+        <svg class="icon-sm"><use href="#i-log-out"/></svg><span>Byt roll</span>
+      </button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-title" id="kundPageTitle">Välkommen tillbaka</div>
+        <div class="page-sub">Era uppdrag hos Crew2you</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-accent" onclick="alert('Skickar förfrågan till Crew2you...')">
+          <svg class="icon-sm"><use href="#i-plus"/></svg> Begär nytt uppdrag
+        </button>
+      </div>
+    </header>
+    <div class="content" id="kundContent"></div>
+  </main>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 id="bookingModalTitle">Nytt uppdrag</h3>
+        <div class="sub">Fyll i uppgifter för ett nytt demouppdrag</div>
+      </div>
+      <button class="close-btn" onclick="closeBookingModal()"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>Plats / Butik</label><input type="text" id="f_butik" placeholder="Ex: Ica Maxi Bromma"></div>
+        <div class="field"><label>Kontaktperson</label><input type="text" id="f_kontakt" placeholder="Ex: Martin"></div>
+        <div class="field"><label>Telefon</label><input type="text" id="f_tel" placeholder="08-123456"></div>
+        <div class="field"><label>Ort</label><input type="text" id="f_ort" placeholder="Stockholm"></div>
+        <div class="field"><label>Region</label>
+          <select id="f_region">
+            <option>Stockholm</option><option>Utanför Stockholm</option><option>Löpande uppdrag</option>
+          </select>
+        </div>
+        <div class="field"><label>Datum / Dagar</label><input type="text" id="f_dagar" placeholder="tis 10-18"></div>
+        <div class="field"><label>Antal timmar</label><input type="number" id="f_timmar" placeholder="7" step="0.5"></div>
+        <div class="field full"><label>Kund / Uppdragsgivare</label><input type="text" id="f_kund" placeholder="Ex: Falbygdens / Jenny Reftegård"></div>
+        <div class="field"><label>Tjänst</label>
+          <select id="f_tjanst"><option>demo</option><option>plock</option><option>sampling</option><option>event</option></select>
+        </div>
+        <div class="field"><label>Tilldelad personal</label>
+          <select id="f_personal">
+            <option value="">– Ej tillsatt –</option>
+            <option>Lars Djupsjö</option><option>Stina Bergkvist</option><option>Cicci G</option>
+            <option>Lars Smith</option><option>Sven-Olof Granberg</option><option>Elaine</option>
+          </select>
+        </div>
+        <div class="field full"><label>Produkt</label><input type="text" id="f_produkt" placeholder="Ex: Hummersoppa"></div>
+        <div class="field full"><label>Material</label><input type="text" id="f_material" placeholder="Ex: Demofat + skedar + stekplatta"></div>
+        <div class="field full"><label>Övrig info</label><textarea id="f_info" placeholder="Särskilda instruktioner..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeBookingModal()">Avbryt</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline" onclick="saveBooking('draft')">Spara utkast</button>
+        <button class="btn btn-primary" onclick="saveBooking('bokad')">
+          <svg class="icon-sm"><use href="#i-check"/></svg> Spara & boka
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" id="detailModalInner"></div>
+</div>
+
+<div class="modal-overlay" id="utlaggModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h3>Nytt utlägg</h3><div class="sub">Registrera utlägg kopplat till ett uppdrag</div></div>
+      <button class="close-btn" onclick="closeUtlaggModal()"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>Koppla till uppdrag</label><select id="u_uppdrag"></select></div>
+        <div class="field"><label>Typ</label>
+          <select id="u_typ"><option>Material</option><option>Milersättning</option><option>Parkering</option><option>Mat / fika</option><option>Övrigt</option></select>
+        </div>
+        <div class="field"><label>Belopp (kr)</label><input type="number" id="u_belopp" placeholder="200" step="0.01"></div>
+        <div class="field full"><label>Beskrivning</label><input type="text" id="u_beskr" placeholder="Ex: 300 demofat + skedar"></div>
+        <div class="field full"><label>Kvitto (foto)</label><input type="file" accept="image/*">
+          <div class="field-hint">I skarp version sparas foto direkt till molnet</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeUtlaggModal()">Avbryt</button>
+      <button class="btn btn-primary" onclick="saveUtlagg()">
+        <svg class="icon-sm"><use href="#i-check"/></svg> Spara utlägg
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOAST CONTAINER ============ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ============ LOGO (placeholder set on load) ============ */
+const LOGO_SRC = "https://axypazcbgcogtdqqimvi.supabase.co/storage/v1/object/public/Bilder/main-logo.png";
+
+/* ============ DATA ============ */
+const PERSONAL = [
+  { id: 'p1', namn: 'Lars Djupsjö', init: 'LD', tel: '070-111 22 33', email: 'lars@crew2you.se' },
+  { id: 'p2', namn: 'Stina Bergkvist', init: 'SB', tel: '070-222 33 44', email: 'stina@crew2you.se' },
+  { id: 'p3', namn: 'Cicci G', init: 'CG', tel: '070-333 44 55', email: 'cicci@crew2you.se' },
+  { id: 'p4', namn: 'Lars Smith', init: 'LS', tel: '070-444 55 66', email: 'lars.s@crew2you.se' },
+  { id: 'p5', namn: 'Sven-Olof Granberg', init: 'SG', tel: '070-555 66 77', email: 'sven@crew2you.se' },
+  { id: 'p6', namn: 'Elaine', init: 'EL', tel: '070-666 77 88', email: 'elaine@crew2you.se' },
+];
+
+const KUNDER = [
+  { id: 'k1', namn: 'Falbygdens Ost', kontakt: 'Jenny Reftegård', tel: '072-371 00 31' },
+  { id: 'k2', namn: 'Hanssons', kontakt: 'Emma Hansson', tel: '011-122 22' },
+  { id: 'k3', namn: 'Bake my day', kontakt: 'Maria', tel: '08-123456' },
+  { id: 'k4', namn: 'Wernerssons', kontakt: 'Malin / Helena Wieweg', tel: '071-233 44' },
+  { id: 'k5', namn: 'Dafgård', kontakt: 'Fredrik Eriksson', tel: '073-111 11' },
+  { id: 'k6', namn: 'Engelmanns', kontakt: 'Tobbe', tel: '070-888 99 00' },
+  { id: 'k7', namn: 'Härryda', kontakt: 'Miguell Frignell', tel: '08-5555' },
+];
+
+const BOKNINGAR = [
+  { id: 'b1', butik: 'Hemköp Wasahallen', kontakt: 'Ulf', tel: '078-88 899', ort: 'Stockholm', region: 'Stockholm', dagar: 'tis 10-18', timmar: 7, kund: 'Hanssons', kundKontakt: 'Emma Hansson 011-122', tjanst: 'demo', personal: 'Lars Djupsjö', produkt: 'Hummersoppa', material: 'Demofat + skedar + stekplatta + kastrull + slev', utskick: 'Demofat + skedar GL 15415 1/1 MK', info: 'Info ok! 7/1 mk', foto: true, stage: 'aterrapporterad', anlagd: '2026-01-01', aterrapport: 'Butiken var jättenöjd, han sålde bra och var väldigt aktiv under demon.' },
+  { id: 'b2', butik: 'Ica Maxi Bromma', kontakt: 'Martin', tel: '08-123456', ort: 'Bromma', region: 'Stockholm', dagar: 'fre 11-19', timmar: 7, kund: 'Bake my day', kundKontakt: 'Maria 08-123456', tjanst: 'demo', personal: 'Lars Smith', produkt: 'Nybakat bröd', material: 'Brödrost + smörkniv', stage: 'bekraftad', anlagd: '2026-01-29' },
+  { id: 'b3', butik: 'Stora Coop Arninge', kontakt: 'Tony', tel: '08-123654', ort: 'Täby', region: 'Stockholm', dagar: 'lör 11-16', timmar: 8, kund: 'Wernerssons', kundKontakt: 'Malin 123456', tjanst: 'demo', personal: 'Sven-Olof Granberg', produkt: 'Brie de maux', material: 'Tandpetare + svart duk', info: 'Annorlunda tid', ovrigInfo: 'Nyöppning i butiken. 1 timme extra.', stage: 'personal', anlagd: '2026-01-04' },
+  { id: 'b4', butik: 'Ica Maxi Nacka', kontakt: 'Ida', tel: '073-1111', ort: 'Nacka', region: 'Stockholm', dagar: 'tor+fre 11-19', timmar: 7, kund: 'Dafgård', kundKontakt: 'Fredrik Eriksson 073-11111', tjanst: 'demo', personal: 'Cicci G', produkt: 'Lasagne', material: 'Ugn + slev, demofat + pommesgafflar', utskick: 'Ugn + demofat + pommesgafflar', info: 'Info ok! Utan produkter 8/1 mk', ovrigInfo: 'Meddelar vart de ställer ugnen så GL hittar på måndag', stage: 'bekraftad', anlagd: '2026-01-08' },
+  { id: 'b5', butik: 'Ica Maxi Vasa', kontakt: 'Tobias', tel: '08-123456', ort: 'Södertälje', region: 'Stockholm', dagar: 'tor+fre 10-18', timmar: 14, kund: 'Wernerssons', kundKontakt: 'Helena Wieweg 071-233 44', tjanst: 'demo', personal: '', produkt: 'Tage', material: 'Tandpetare', ovrigInfo: 'Lämnar demoprover.', stage: 'bokad', anlagd: '2026-02-03' },
+  { id: 'b6', butik: 'Ica SM Nykvarn', kontakt: 'Micke', tel: '', ort: 'Nykvarn', region: 'Stockholm', dagar: 'fre 11-19', timmar: 7, kund: 'Engelmanns', kundKontakt: 'Tobbe', tjanst: 'demo', personal: 'Stina Bergkvist', produkt: 'Kaltbach Creamy', material: 'Tandpetare', info: 'ok', stage: 'genomford', anlagd: '2026-04-02' },
+  { id: 'b7', butik: 'Ica Maxi Skövde', kontakt: 'Arne', tel: '087-7777', ort: 'Skövde', region: 'Utanför Stockholm', dagar: 'fre 11-19', timmar: 7, kund: 'Härryda', kundKontakt: 'Miguell Frignell 08-5555', tjanst: 'demo', personal: '', info: 'Behöver veta senast torsdag om denna går att lösa', stage: 'inkommen', anlagd: '2026-01-03' },
+  { id: 'b8', butik: 'Stora Coop Orminge', kontakt: 'Sandra', tel: '076-391 61 39', ort: 'Nacka', region: 'Löpande uppdrag', dagar: 'mån+tor', timmar: 4, kund: 'Falbygdens', kundKontakt: 'Jenny Reftegård 072-371 00 31', tjanst: 'plock', personal: 'Stina Bergkvist', produkt: 'Ost — sortiment', material: '', info: 'Order måndag innan kl. 9 + plock. Tor plock baklager / piff', stage: 'aterrapporterad', anlagd: '2025-12-15' },
+  { id: 'b9', butik: 'Ica Kvantum Farsta', kontakt: 'Isak', tel: '', ort: 'Farsta', region: 'Löpande uppdrag', dagar: 'mån+tor', timmar: 4, kund: 'Falbygdens ost', kundKontakt: 'Urban 073-383 31 30', tjanst: 'plock', personal: 'Elaine', produkt: 'Ost — sortiment', material: '', info: 'Order måndag innan kl. 9 + plock. Tor plock baklager / piff', ovrigInfo: 'Vi sätter ner priserna och lämnar i "bra pris"-kylen. Butiken vill bara ha order efter listan — finns instruktion i mappen.', stage: 'fakturerad', anlagd: '2025-12-15' },
+  { id: 'b10', butik: 'Coop Konsum Gävle', kontakt: 'Pernilla', tel: '026-88 99', ort: 'Gävle', region: 'Utanför Stockholm', dagar: 'fre 11-18', timmar: 7, kund: 'Falbygdens Ost', kundKontakt: 'Jenny Reftegård', tjanst: 'demo', personal: '', produkt: 'Västerbottensost', stage: 'inkommen', anlagd: '2026-04-12' },
+];
+
+const UTLAGG = [
+  { id: 'u1', bokningId: 'b1', person: 'Lars Djupsjö', typ: 'Milersättning', belopp: 200, beskrivning: '4 mil + parkering', datum: '2026-01-07' },
+  { id: 'u2', bokningId: 'b1', person: 'Lars Djupsjö', typ: 'Material', belopp: 532, beskrivning: '300 fat + sked + utskick', datum: '2026-01-07' },
+  { id: 'u3', bokningId: 'b6', person: 'Stina Bergkvist', typ: 'Milersättning', belopp: 575, beskrivning: '23 mil resa till Nykvarn', datum: '2026-04-02' },
+  { id: 'u4', bokningId: 'b6', person: 'Stina Bergkvist', typ: 'Parkering', belopp: 21, beskrivning: 'P-avgift Ica SM', datum: '2026-04-02' },
+  { id: 'u5', bokningId: 'b8', person: 'Stina Bergkvist', typ: 'Milersättning', belopp: 120, beskrivning: 'Plockrunda v.15', datum: '2026-04-10' },
+];
+
+const STAGE_META = {
+  inkommen: { label: 'Inkommen', color: 'var(--slate)' },
+  bokad: { label: 'Bokad', color: 'var(--blue)' },
+  bekraftad: { label: 'Bekräftad', color: 'var(--violet)' },
+  personal: { label: 'Personal tillsatt', color: 'var(--pink)' },
+  genomford: { label: 'Genomförd', color: 'var(--amber)' },
+  aterrapporterad: { label: 'Återrapporterad', color: 'var(--green)' },
+  fakturerad: { label: 'Fakturerad', color: 'var(--gold-dark)' },
+};
+
+/* Automations driven by Samify Autoflow */
+const AUTOMATIONS = [
+  {
+    id: 'a1',
+    name: 'Bokningsbekräftelse till butik & kund',
+    desc: 'När ett uppdrag flyttas till "Bekräftad" skickas automatiskt mail till butikens kontaktperson samt uppdragsgivaren med datum, tid och vilken demovärd som kommer.',
+    trigger: 'Status → Bekräftad',
+    actions: [{ type: 'mail', label: 'Skicka mail' }],
+    enabled: true,
+    runs: 47,
+    lastRun: 'För 2 timmar sen',
+    icon: 'mail',
+  },
+  {
+    id: 'a2',
+    name: 'SMS + kalenderinvite till personal',
+    desc: 'När personal tilldelas ett uppdrag får hen SMS med butiksadress + tid, och en kalenderinvite som synkas till telefonen.',
+    trigger: 'Personal tillsatt',
+    actions: [{ type: 'sms', label: 'SMS' }, { type: 'calendar', label: 'Kalender' }],
+    enabled: true,
+    runs: 34,
+    lastRun: 'Igår 14:22',
+    icon: 'message-square',
+  },
+  {
+    id: 'a3',
+    name: 'Påminnelse-SMS 24h innan uppdrag',
+    desc: 'Dagen innan uppdraget får demovärden ett automatiskt SMS med påminnelse, material-checklista och kontaktperson i butiken.',
+    trigger: '24h före uppdrag',
+    actions: [{ type: 'sms', label: 'SMS' }],
+    enabled: true,
+    runs: 52,
+    lastRun: 'Idag 11:00',
+    icon: 'bell',
+  },
+  {
+    id: 'a4',
+    name: 'Återrapport → uppdragsgivare',
+    desc: 'När demovärden skickar in sin återrapport vidarebefordras den automatiskt till uppdragsgivaren (med foto och försäljningssiffror).',
+    trigger: 'Återrapport inskickad',
+    actions: [{ type: 'mail', label: 'Mail' }],
+    enabled: true,
+    runs: 29,
+    lastRun: 'Igår 17:45',
+    icon: 'send',
+  },
+  {
+    id: 'a5',
+    name: 'Fakturaunderlag till Fortnox',
+    desc: 'När uppdraget markeras som "Återrapporterad" skapas automatiskt ett fakturaunderlag i Fortnox med timmar + utlägg, redo för granskning.',
+    trigger: 'Status → Återrapporterad',
+    actions: [{ type: 'fortnox', label: 'Fortnox' }],
+    enabled: true,
+    runs: 18,
+    lastRun: 'I morse 09:12',
+    icon: 'receipt',
+  },
+  {
+    id: 'a6',
+    name: 'Slack-notis vid nya utlägg',
+    desc: 'När en demovärd registrerar ett utlägg i personalappen får kontoret direkt en Slack-notis i kanalen #utlagg för snabb granskning.',
+    trigger: 'Nytt utlägg',
+    actions: [{ type: 'slack', label: 'Slack' }],
+    enabled: true,
+    runs: 61,
+    lastRun: 'För 18 min sen',
+    icon: 'message-square',
+  },
+  {
+    id: 'a7',
+    name: 'Veckorapport till uppdragsgivare',
+    desc: 'Varje fredag kl. 16:00 skickas en sammanfattning till alla uppdragsgivare med veckans genomförda uppdrag, återrapporter och foton.',
+    trigger: 'Varje fredag 16:00',
+    actions: [{ type: 'mail', label: 'Sammanställ & maila' }],
+    enabled: false,
+    runs: 0,
+    lastRun: 'Aldrig körd',
+    icon: 'file-text',
+  },
+  {
+    id: 'a8',
+    name: 'Auto-matcha personal till inkomna uppdrag',
+    desc: 'När ett nytt uppdrag kommer in föreslås automatiskt bästa personalmatch baserat på geografi, tidigare uppdrag hos samma kund och tillgänglighet.',
+    trigger: 'Nytt uppdrag skapat',
+    actions: [{ type: 'ai', label: 'AI-matchning' }],
+    enabled: false,
+    runs: 0,
+    lastRun: 'Aldrig körd',
+    icon: 'zap',
+  },
+];
+
+/* Activity log — recent automation runs */
+const ACTIVITY_LOG = [
+  { id: 'r1', time: 'För 18 min', automation: 'Slack-notis vid nya utlägg', target: 'Kanal #utlagg', details: 'Lars Djupsjö registrerade 532 kr (material, Hemköp Wasahallen)', type: 'slack' },
+  { id: 'r2', time: 'För 2 timmar', automation: 'Bokningsbekräftelse', target: 'ida@icamaxi-nacka.se, fredrik@dafgard.se', details: 'Ica Maxi Nacka — tor+fre 11-19', type: 'mail' },
+  { id: 'r3', time: 'Idag 11:00', automation: 'Påminnelse-SMS 24h', target: '070-222 33 44', details: 'Stina Bergkvist — Ica SM Nykvarn i morgon 11-19', type: 'sms' },
+  { id: 'r4', time: 'I morse 09:12', automation: 'Fakturaunderlag till Fortnox', target: 'Fortnox (Hanssons)', details: 'Hemköp Wasahallen — 4 997 kr (arbete + utlägg)', type: 'fortnox' },
+  { id: 'r5', time: 'Igår 17:45', automation: 'Återrapport → uppdragsgivare', target: 'emma@hanssons.se', details: 'Hemköp Wasahallen — återrapport från Lars Djupsjö', type: 'mail' },
+  { id: 'r6', time: 'Igår 14:22', automation: 'SMS + kalenderinvite till personal', target: 'Sven-Olof Granberg', details: 'Stora Coop Arninge — lör 11-16', type: 'sms' },
+  { id: 'r7', time: 'Igår 10:08', automation: 'Slack-notis vid nya utlägg', target: 'Kanal #utlagg', details: 'Stina Bergkvist registrerade 120 kr (milersättning)', type: 'slack' },
+  { id: 'r8', time: '2 dagar sen', automation: 'Bokningsbekräftelse', target: 'tony@coop-arninge.se', details: 'Stora Coop Arninge — lör 11-16', type: 'mail' },
+];
+
+/* ============ INIT LOGOS ============ */
+function initLogos() {
+  const img = `<img src="${LOGO_SRC}" alt="Crew2you">`;
+  document.getElementById('loginLogoSlot').innerHTML = img;
+  document.getElementById('sbLogo1').innerHTML = img;
+  document.getElementById('sbLogo2').innerHTML = img;
+}
+
+/* ============ AUTH ============ */
+let currentRole = null;
+let currentView = 'dashboard';
+
+function login(role) {
+  currentRole = role;
+  document.getElementById('loginScreen').style.display = 'none';
+  ['adminApp', 'personalApp', 'kundApp'].forEach(id => document.getElementById(id).classList.remove('active'));
+  if (role === 'admin') { document.getElementById('adminApp').classList.add('active'); setView('dashboard'); }
+  else if (role === 'personal') { document.getElementById('personalApp').classList.add('active'); setMobileTab('uppdrag'); }
+  else if (role === 'kund') { document.getElementById('kundApp').classList.add('active'); setKundView('oversikt'); }
+}
+function logout() {
+  currentRole = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  ['adminApp', 'personalApp', 'kundApp'].forEach(id => document.getElementById(id).classList.remove('active'));
+}
+
+/* ============ ADMIN VIEWS ============ */
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('#adminApp .nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === view));
+  const titles = {
+    dashboard: ['Översikt', 'Vad händer i Crew2you idag'],
+    pipeline: ['Pipeline', 'Alla uppdrag i arbetsflödet'],
+    bokningar: ['Bokningar', 'Alla uppdrag i tabellvy'],
+    personal: ['Personal', 'Demovärdar och bemanning'],
+    kunder: ['Kunder & butiker', 'Uppdragsgivare och platser'],
+    fakturor: ['Fakturaunderlag', 'Klara att skickas till Fortnox'],
+    lon: ['Löneunderlag', 'Timmar och utlägg per person'],
+    automations: ['Samify Autoflow™', 'Automatiserade flöden som sparar timmar varje vecka'],
+  };
+  document.getElementById('pageTitle').textContent = titles[view][0];
+  document.getElementById('pageSub').textContent = titles[view][1];
+  renderView(view);
+}
+
+function renderView(view) {
+  const el = document.getElementById('adminContent');
+  if (view === 'dashboard') el.innerHTML = renderDashboard();
+  else if (view === 'pipeline') el.innerHTML = renderPipeline();
+  else if (view === 'bokningar') el.innerHTML = renderBokningar();
+  else if (view === 'personal') el.innerHTML = renderPersonalList();
+  else if (view === 'kunder') el.innerHTML = renderKunder();
+  else if (view === 'fakturor') el.innerHTML = renderFakturor();
+  else if (view === 'lon') el.innerHTML = renderLon();
+  else if (view === 'automations') el.innerHTML = renderAutomations();
+}
+
+function icon(name, cls='icon') { return `<svg class="${cls}"><use href="#i-${name}"/></svg>`; }
+
+function renderDashboard() {
+  const aktiva = BOKNINGAR.filter(b => !['fakturerad'].includes(b.stage)).length;
+  const veckan = BOKNINGAR.filter(b => ['bokad', 'bekraftad', 'personal'].includes(b.stage)).length;
+  const obemannade = BOKNINGAR.filter(b => !b.personal && b.stage !== 'fakturerad').length;
+  const attFakturera = BOKNINGAR.filter(b => b.stage === 'aterrapporterad').length;
+  const totalUtlagg = UTLAGG.reduce((s, u) => s + u.belopp, 0);
+
+  return `
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-head">
+          <div class="kpi-label">Aktiva uppdrag</div>
+          <div class="kpi-icon">${icon('calendar','icon-sm')}</div>
+        </div>
+        <div class="kpi-value">${aktiva}</div>
+        <div class="kpi-change up">${icon('trending-up','icon-sm')} +3 denna vecka</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head">
+          <div class="kpi-label">Kommande vecka</div>
+          <div class="kpi-icon">${icon('clock','icon-sm')}</div>
+        </div>
+        <div class="kpi-value">${veckan}</div>
+        <div class="kpi-change ${obemannade > 0 ? 'warn' : ''}">
+          ${obemannade > 0 ? icon('alert-circle','icon-sm') : icon('check','icon-sm')}
+          ${obemannade} saknar personal
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head">
+          <div class="kpi-label">Att fakturera</div>
+          <div class="kpi-icon">${icon('receipt','icon-sm')}</div>
+        </div>
+        <div class="kpi-value">${attFakturera}</div>
+        <div class="kpi-change up">${icon('check','icon-sm')} Klara att exporteras</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-head">
+          <div class="kpi-label">Utlägg denna månad</div>
+          <div class="kpi-icon">${icon('wallet','icon-sm')}</div>
+        </div>
+        <div class="kpi-value">${totalUtlagg.toLocaleString('sv-SE')} <small>kr</small></div>
+        <div class="kpi-change">${UTLAGG.length} poster registrerade</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px; margin-bottom: 16px;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Uppdrag denna vecka</div>
+          <button class="btn btn-ghost btn-sm" onclick="setView('pipeline')">Pipeline ${icon('arrow-right','icon-sm')}</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Datum</th><th>Butik</th><th>Kund</th><th>Personal</th><th>Status</th></tr></thead>
+            <tbody>
+              ${BOKNINGAR.filter(b => !['fakturerad', 'aterrapporterad'].includes(b.stage)).slice(0, 6).map(b => `
+                <tr onclick="openDetailModal('${b.id}')" style="cursor:pointer;">
+                  <td class="td-strong">${b.dagar}</td>
+                  <td><div class="td-strong">${b.butik}</div><div class="td-muted" style="font-size:11.5px; margin-top:2px;">${b.ort}</div></td>
+                  <td>${b.kund}</td>
+                  <td>${b.personal || `<span style="color:var(--red); display:inline-flex; align-items:center; gap:4px;">${icon('user-alert','icon-sm')} Ej tillsatt</span>`}</td>
+                  <td><span class="status-badge status-${b.stage}">${STAGE_META[b.stage].label}</span></td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Behöver uppmärksamhet</div></div>
+        <div style="padding: 0;">
+          ${BOKNINGAR.filter(b => !b.personal && b.stage !== 'fakturerad').map(b => `
+            <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); cursor:pointer; transition: background 0.1s;" onclick="openDetailModal('${b.id}')" onmouseover="this.style.background='var(--surface-alt)'" onmouseout="this.style.background=''">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <div style="color:var(--amber); margin-top:2px;">${icon('alert-circle','icon-sm')}</div>
+                <div style="flex:1;">
+                  <div class="td-strong" style="font-size:13.5px;">${b.butik}</div>
+                  <div class="td-muted" style="font-size:12px; margin-top:2px;">${b.dagar} · Saknar personal</div>
+                </div>
+              </div>
+            </div>`).join('') || `<div class="empty">${icon('check','icon-lg')}<div>Allt under kontroll</div></div>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Senaste utlägg från fält</div></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Datum</th><th>Person</th><th>Typ</th><th>Uppdrag</th><th>Beskrivning</th><th style="text-align:right;">Belopp</th></tr></thead>
+          <tbody>
+            ${UTLAGG.slice().reverse().slice(0, 5).map(u => {
+              const b = BOKNINGAR.find(x => x.id === u.bokningId);
+              return `<tr>
+                <td class="td-muted">${u.datum}</td>
+                <td class="td-strong">${u.person}</td>
+                <td><span class="chip">${u.typ}</span></td>
+                <td>${b ? b.butik : '–'}</td>
+                <td class="td-muted">${u.beskrivning}</td>
+                <td style="text-align:right; font-weight:600;">${u.belopp.toLocaleString('sv-SE')} kr</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderPipeline() {
+  const stages = ['inkommen', 'bokad', 'bekraftad', 'personal', 'genomford', 'aterrapporterad', 'fakturerad'];
+  return `
+    <div class="filter-row">
+      <div class="search-box">
+        ${icon('search')}
+        <input type="text" placeholder="Sök butik, kund, personal..." oninput="filterPipeline(this.value)">
+      </div>
+      <select class="filter-select" onchange="filterPipelineRegion(this.value)">
+        <option value="">Alla regioner</option><option>Stockholm</option><option>Utanför Stockholm</option><option>Löpande uppdrag</option>
+      </select>
+      <div style="margin-left:auto; font-size:12.5px; color:var(--ink-muted);">Klicka på kort för detalj & flytta steg</div>
+    </div>
+    <div class="pipeline" id="pipelineGrid">
+      ${stages.map(stage => {
+        const bokningar = BOKNINGAR.filter(b => b.stage === stage);
+        return `
+          <div class="pipeline-col" data-stage="${stage}">
+            <div class="pipeline-head">
+              <h4><span class="stage-dot" style="background:${STAGE_META[stage].color}"></span>${STAGE_META[stage].label}</h4>
+              <div class="pipeline-count">${bokningar.length}</div>
+            </div>
+            ${bokningar.map(b => renderBookingCard(b)).join('')}
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderBookingCard(b) {
+  return `
+    <div class="booking-card" onclick="openDetailModal('${b.id}')" data-bid="${b.id}" data-region="${b.region}" data-text="${(b.butik + ' ' + b.kund + ' ' + (b.personal||'') + ' ' + b.ort).toLowerCase()}">
+      <div class="bc-butik">${b.butik}</div>
+      <div class="bc-ort">${icon('map-pin','icon-sm')} ${b.ort} · ${b.dagar}</div>
+      <div class="bc-meta">
+        <span class="chip ${b.tjanst}">${b.tjanst}</span>
+        <span class="chip">${icon('clock','icon-sm')}${b.timmar} h</span>
+      </div>
+      <div class="bc-kund">${b.kund}</div>
+      <div class="bc-person ${!b.personal ? 'missing' : ''}">
+        ${b.personal ? icon('user','icon-sm') + ' ' + b.personal : icon('user-alert','icon-sm') + ' Saknar personal'}
+      </div>
+    </div>
+  `;
+}
+
+function filterPipeline(q) { q = q.toLowerCase(); document.querySelectorAll('.booking-card').forEach(c => { c.style.display = (!q || c.dataset.text.includes(q)) ? '' : 'none'; }); }
+function filterPipelineRegion(r) { document.querySelectorAll('.booking-card').forEach(c => { c.style.display = (!r || c.dataset.region === r) ? '' : 'none'; }); }
+
+function renderBokningar() {
+  return `
+    <div class="filter-row">
+      <div class="search-box">${icon('search')}<input type="text" placeholder="Sök..." oninput="filterTable(this.value)"></div>
+      <select class="filter-select" onchange="filterTableStage(this.value)">
+        <option value="">Alla statusar</option>
+        ${Object.entries(STAGE_META).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data" id="bokningsTable">
+          <thead><tr><th>Datum</th><th>Butik</th><th>Ort</th><th>Kund</th><th>Tjänst</th><th>Personal</th><th>Tim</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            ${BOKNINGAR.map(b => `
+              <tr data-stage="${b.stage}" data-text="${(b.butik+' '+b.kund+' '+(b.personal||'')+' '+b.ort).toLowerCase()}">
+                <td class="td-strong">${b.dagar}</td>
+                <td class="td-strong">${b.butik}</td>
+                <td class="td-muted">${b.ort}</td>
+                <td>${b.kund}</td>
+                <td><span class="chip ${b.tjanst}">${b.tjanst}</span></td>
+                <td>${b.personal || '<span class="td-muted">–</span>'}</td>
+                <td>${b.timmar}h</td>
+                <td><span class="status-badge status-${b.stage}">${STAGE_META[b.stage].label}</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openDetailModal('${b.id}')">Öppna ${icon('chevron-right','icon-sm')}</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+function filterTable(q) { q = q.toLowerCase(); document.querySelectorAll('#bokningsTable tbody tr').forEach(r => { r.style.display = (!q || r.dataset.text.includes(q)) ? '' : 'none'; }); }
+function filterTableStage(s) { document.querySelectorAll('#bokningsTable tbody tr').forEach(r => { r.style.display = (!s || r.dataset.stage === s) ? '' : 'none'; }); }
+
+function renderPersonalList() {
+  return `
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Namn</th><th>Initialer</th><th>Kontakt</th><th>Aktiva uppdrag</th><th>Denna månad</th></tr></thead>
+          <tbody>
+            ${PERSONAL.map(p => {
+              const aktiva = BOKNINGAR.filter(b => b.personal === p.namn && b.stage !== 'fakturerad').length;
+              const tim = BOKNINGAR.filter(b => b.personal === p.namn).reduce((s, b) => s + (b.timmar || 0), 0);
+              return `<tr>
+                <td><div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:var(--gold-bg); color:var(--gold-dark); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${p.init}</div>
+                  <span class="td-strong">${p.namn}</span>
+                </div></td>
+                <td><span class="chip">${p.init}</span></td>
+                <td><div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px;">${icon('phone','icon-sm')} ${p.tel}</span>
+                  <span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-muted);">${icon('mail','icon-sm')} ${p.email}</span>
+                </div></td>
+                <td class="td-strong">${aktiva}</td>
+                <td>${tim} h</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderKunder() {
+  return `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><div class="card-title">Uppdragsgivare (${KUNDER.length})</div></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Kund</th><th>Kontaktperson</th><th>Telefon</th><th>Antal uppdrag</th></tr></thead>
+          <tbody>
+            ${KUNDER.map(k => {
+              const antal = BOKNINGAR.filter(b => b.kund.includes(k.namn.split(' ')[0])).length;
+              return `<tr><td class="td-strong">${k.namn}</td><td>${k.kontakt}</td><td class="td-muted">${k.tel}</td><td>${antal}</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Butiker / platser</div></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Butik</th><th>Ort</th><th>Kontakt</th><th>Telefon</th><th>Region</th></tr></thead>
+          <tbody>
+            ${[...new Map(BOKNINGAR.map(b => [b.butik, b])).values()].map(b => `
+              <tr><td class="td-strong">${b.butik}</td><td class="td-muted">${b.ort}</td><td>${b.kontakt || '–'}</td><td class="td-muted">${b.tel || '–'}</td><td><span class="chip">${b.region}</span></td></tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderFakturor() {
+  const attFakturera = BOKNINGAR.filter(b => b.stage === 'aterrapporterad');
+  const fakturerade = BOKNINGAR.filter(b => b.stage === 'fakturerad');
+  const TIMPRIS = 495;
+  let totalAtt = 0;
+  const rows = attFakturera.map(b => {
+    const utlaggSum = UTLAGG.filter(u => u.bokningId === b.id).reduce((s, u) => s + u.belopp, 0);
+    const arbKost = b.timmar * TIMPRIS;
+    const total = arbKost + utlaggSum;
+    totalAtt += total;
+    return { b, utlaggSum, arbKost, total };
+  });
+
+  return `
+    <div class="invoice-summary">
+      <div class="invoice-row"><span>Klara att fakturera:</span><strong>${attFakturera.length} uppdrag</strong></div>
+      <div class="invoice-row"><span>Timpris (demo):</span><strong>${TIMPRIS} kr / h</strong></div>
+      <div class="invoice-row"><span>Total arbetskostnad:</span><span>${rows.reduce((s,r)=>s+r.arbKost,0).toLocaleString('sv-SE')} kr</span></div>
+      <div class="invoice-row"><span>Total utlägg:</span><span>${rows.reduce((s,r)=>s+r.utlaggSum,0).toLocaleString('sv-SE')} kr</span></div>
+      <div class="invoice-row total"><span>Summa att fakturera:</span><span>${totalAtt.toLocaleString('sv-SE')} kr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Att fakturera (${attFakturera.length})</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="exportData()">${icon('download','icon-sm')} CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="alert('Skickar underlag till Fortnox via integrationen... ✓')">${icon('send','icon-sm')} Skicka till Fortnox</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Datum</th><th>Butik</th><th>Kund</th><th>Tim</th><th>Arbete</th><th>Utlägg</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody>
+            ${rows.map(({b, utlaggSum, arbKost, total}) => `
+              <tr onclick="openDetailModal('${b.id}')" style="cursor:pointer;">
+                <td class="td-muted">${b.dagar}</td>
+                <td><div class="td-strong">${b.butik}</div><div class="td-muted" style="font-size:11.5px; margin-top:2px;">${b.ort}</div></td>
+                <td>${b.kund}</td>
+                <td>${b.timmar} h</td>
+                <td>${arbKost.toLocaleString('sv-SE')} kr</td>
+                <td class="td-muted">${utlaggSum.toLocaleString('sv-SE')} kr</td>
+                <td style="text-align:right; font-weight:700; color:var(--ink);">${total.toLocaleString('sv-SE')} kr</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="height:16px;"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Redan fakturerade</div></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Datum</th><th>Butik</th><th>Kund</th><th>Status</th></tr></thead>
+          <tbody>
+            ${fakturerade.map(b => `
+              <tr><td class="td-muted">${b.dagar}</td><td class="td-strong">${b.butik}</td><td>${b.kund}</td><td><span class="status-badge status-fakturerad">Fakturerad</span></td></tr>
+            `).join('') || '<tr><td colspan="4" class="empty">Inga fakturerade än</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderLon() {
+  const perPersonUtlagg = {};
+  PERSONAL.forEach(p => perPersonUtlagg[p.namn] = 0);
+  UTLAGG.forEach(u => { if (perPersonUtlagg[u.person] !== undefined) perPersonUtlagg[u.person] += u.belopp; });
+  const TIMLON = 180;
+  const rows = PERSONAL.map(p => {
+    const uppdrag = BOKNINGAR.filter(b => b.personal === p.namn);
+    const timmar = uppdrag.reduce((s, b) => s + (b.timmar || 0), 0);
+    const lon = timmar * TIMLON;
+    const utlagg = perPersonUtlagg[p.namn] || 0;
+    return { p, uppdrag: uppdrag.length, timmar, lon, utlagg, total: lon + utlagg };
+  });
+  const totalLon = rows.reduce((s, r) => s + r.lon, 0);
+  const totalUtlagg = rows.reduce((s, r) => s + r.utlagg, 0);
+
+  return `
+    <div class="invoice-summary">
+      <div class="invoice-row"><span>Timlön (demo):</span><strong>${TIMLON} kr / h</strong></div>
+      <div class="invoice-row"><span>Total lön:</span><span>${totalLon.toLocaleString('sv-SE')} kr</span></div>
+      <div class="invoice-row"><span>Total utlägg (ersätts):</span><span>${totalUtlagg.toLocaleString('sv-SE')} kr</span></div>
+      <div class="invoice-row total"><span>Total utbetalning:</span><span>${(totalLon+totalUtlagg).toLocaleString('sv-SE')} kr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Löneunderlag denna period</div>
+        <button class="btn btn-primary btn-sm" onclick="alert('Exporterar till lönesystem...')">${icon('download','icon-sm')} Exportera</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Person</th><th>Uppdrag</th><th>Timmar</th><th>Lön</th><th>Utlägg</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:30px; height:30px; border-radius:50%; background:var(--gold-bg); color:var(--gold-dark); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px;">${r.p.init}</div>
+                  <span class="td-strong">${r.p.namn}</span>
+                </div></td>
+                <td>${r.uppdrag}</td>
+                <td class="td-strong">${r.timmar} h</td>
+                <td>${r.lon.toLocaleString('sv-SE')} kr</td>
+                <td class="td-muted">${r.utlagg.toLocaleString('sv-SE')} kr</td>
+                <td style="text-align:right; font-weight:700;">${r.total.toLocaleString('sv-SE')} kr</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ============ DETAIL MODAL ============ */
+function renderBookingTimeline(b) {
+  const stages = ['inkommen', 'bokad', 'bekraftad', 'personal', 'genomford', 'aterrapporterad', 'fakturerad'];
+  const currentIdx = stages.indexOf(b.stage);
+  const events = [];
+
+  // Build synthetic timeline based on stage progression
+  if (currentIdx >= 0) events.push({ label: 'Uppdrag skapat', meta: b.anlagd || '', type: 'neutral', muted: currentIdx === 0 });
+  if (currentIdx >= 1) events.push({ label: 'Uppdrag bokat', meta: 'Statusuppdatering', type: 'neutral', muted: false });
+  if (currentIdx >= 2) events.push({
+    label: 'Bokningsbekräftelse skickad',
+    meta: `Mail · ${b.kontakt || 'butik'} + ${b.kund}`,
+    type: 'mail', muted: false
+  });
+  if (currentIdx >= 3 && b.personal) events.push({
+    label: 'SMS + kalenderinvite skickad',
+    meta: `SMS · ${b.personal}`,
+    type: 'sms', muted: false
+  });
+  if (currentIdx >= 3 && b.personal) events.push({
+    label: 'Påminnelse-SMS schemalagd',
+    meta: `24h innan uppdrag · ${b.personal}`,
+    type: 'bell', muted: false
+  });
+  if (currentIdx >= 4) events.push({ label: 'Uppdrag genomfört', meta: 'Statusuppdatering', type: 'neutral', muted: false });
+  if (currentIdx >= 5) events.push({
+    label: 'Återrapport vidarebefordrad',
+    meta: `Mail · ${b.kund}`,
+    type: 'mail', muted: false
+  });
+  if (currentIdx >= 5) events.push({
+    label: 'Fakturaunderlag skapat i Fortnox',
+    meta: `${b.butik} · ${(b.timmar * 495).toLocaleString('sv-SE')} kr`,
+    type: 'receipt', muted: false
+  });
+  if (currentIdx >= 6) events.push({
+    label: 'Faktura skickad',
+    meta: `Fortnox · ${b.kund}`,
+    type: 'receipt', muted: false
+  });
+
+  const iconMap = { mail: 'mail', sms: 'message-square', bell: 'bell', receipt: 'receipt', neutral: 'check' };
+
+  return events.reverse().map(e => `
+    <div class="activity-item ${e.muted ? 'muted' : ''}">
+      <div class="activity-dot"></div>
+      <div class="activity-content">
+        <div class="activity-main">${e.label}</div>
+        <div class="activity-meta">
+          <span class="activity-chip">${icon(iconMap[e.type] || 'zap','icon-sm')} ${e.type}</span>
+          <span>${e.meta}</span>
+        </div>
+      </div>
+    </div>
+  `).join('') || '<div style="padding: 14px 0; color: var(--ink-muted); font-size: 13px;">Inga automationer har triggats än för detta uppdrag.</div>';
+}
+
+function openDetailModal(id) {
+  const b = BOKNINGAR.find(x => x.id === id);
+  if (!b) return;
+  const utlagg = UTLAGG.filter(u => u.bokningId === id);
+  const stages = ['inkommen', 'bokad', 'bekraftad', 'personal', 'genomford', 'aterrapporterad', 'fakturerad'];
+  const currentIdx = stages.indexOf(b.stage);
+
+  document.getElementById('detailModalInner').innerHTML = `
+    <div class="modal-header">
+      <div>
+        <h3>${b.butik}</h3>
+        <div class="sub">${b.ort} · ${b.dagar} · ${b.kund}</div>
+      </div>
+      <button class="close-btn" onclick="closeDetailModal()">${icon('x')}</button>
+    </div>
+    <div class="modal-body">
+      <div class="stage-track">
+        ${stages.map((s, i) => {
+          const cls = i < currentIdx ? 'done' : (i === currentIdx ? 'current' : 'upcoming');
+          return `<div class="stage-step ${cls}">${STAGE_META[s].label}</div>`;
+        }).join('')}
+      </div>
+
+      <div class="form-grid">
+        <div class="field"><label>Kontaktperson</label><div class="detail-value">${b.kontakt || '–'}${b.tel ? ' · ' + b.tel : ''}</div></div>
+        <div class="field"><label>Region</label><div class="detail-value">${b.region}</div></div>
+        <div class="field"><label>Kund / Uppdragsgivare</label><div class="detail-value multi">${b.kund}<div class="muted">${b.kundKontakt || ''}</div></div></div>
+        <div class="field"><label>Personal</label><div class="detail-value">${b.personal || '<span style="color:var(--red);">Ej tillsatt</span>'}</div></div>
+        <div class="field"><label>Tjänst</label><div class="detail-value"><span class="chip ${b.tjanst}">${b.tjanst}</span></div></div>
+        <div class="field"><label>Antal timmar</label><div class="detail-value">${b.timmar} h</div></div>
+        <div class="field full"><label>Produkt</label><div class="detail-value">${b.produkt || '–'}</div></div>
+        <div class="field full"><label>Material & utskick</label><div class="detail-value multi">${b.material || '–'}${b.utskick ? `<div class="muted" style="margin-top:4px;">Utskick: ${b.utskick}</div>` : ''}</div></div>
+        ${b.info ? `<div class="field full"><label>Info</label><div class="detail-value">${b.info}</div></div>` : ''}
+        ${b.ovrigInfo ? `<div class="field full"><label>Övrig info</label><div class="detail-value" style="background:var(--gold-bg); border-color:var(--gold-light);">${b.ovrigInfo}</div></div>` : ''}
+      </div>
+
+      ${b.aterrapport ? `
+        <div class="divider"></div>
+        <div style="background: var(--green-bg); padding: 16px 18px; border-radius: var(--r); border: 1px solid #a7f3d0;">
+          <div style="font-weight:700; color: var(--green); margin-bottom: 8px; display:flex; align-items:center; gap:8px; font-size:13px;">
+            ${icon('clipboard','icon-sm')} Återrapport från demovärd
+          </div>
+          <div style="color: var(--ink-soft); font-size:13.5px; line-height: 1.6;">${b.aterrapport}</div>
+        </div>
+      ` : ''}
+
+      <div class="divider"></div>
+      <h4 style="margin-bottom:14px; color: var(--ink); font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px;">
+        ${icon('zap','icon-sm')} Autoflow-aktivitet
+      </h4>
+      <div class="activity-timeline">
+        ${renderBookingTimeline(b)}
+      </div>
+
+      ${utlagg.length > 0 ? `
+        <div class="divider"></div>
+        <h4 style="margin-bottom:12px; color: var(--ink); font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px;">
+          ${icon('wallet','icon-sm')} Utlägg (${utlagg.length})
+        </h4>
+        <div class="table-wrap">
+          <table class="data" style="border:1px solid var(--border); border-radius:var(--r); overflow:hidden;">
+            <thead><tr><th>Datum</th><th>Typ</th><th>Beskrivning</th><th style="text-align:right;">Belopp</th></tr></thead>
+            <tbody>
+              ${utlagg.map(u => `<tr>
+                <td class="td-muted">${u.datum}</td>
+                <td><span class="chip">${u.typ}</span></td>
+                <td>${u.beskrivning}</td>
+                <td style="text-align:right; font-weight:600;">${u.belopp.toLocaleString('sv-SE')} kr</td>
+              </tr>`).join('')}
+              <tr style="background:var(--surface-alt);"><td colspan="3" style="text-align:right; font-weight:700;">Summa</td>
+                <td style="text-align:right; font-weight:700; color: var(--gold-dark);">${utlagg.reduce((s,u)=>s+u.belopp,0).toLocaleString('sv-SE')} kr</td></tr>
+            </tbody>
+          </table>
+        </div>
+      ` : ''}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="alert('I skarp version: arkivera/ta bort'); closeDetailModal();">
+        ${icon('archive','icon-sm')} Arkivera
+      </button>
+      <div style="display:flex; gap:10px;">
+        ${currentIdx < stages.length - 1 ? `<button class="btn btn-accent" onclick="advanceStage('${b.id}')">${icon('arrow-right','icon-sm')} Flytta till: ${STAGE_META[stages[currentIdx+1]].label}</button>` : ''}
+        <button class="btn btn-primary" onclick="closeDetailModal()">Stäng</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('active');
+}
+function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
+function advanceStage(id) {
+  const b = BOKNINGAR.find(x => x.id === id);
+  const stages = ['inkommen', 'bokad', 'bekraftad', 'personal', 'genomford', 'aterrapporterad', 'fakturerad'];
+  const idx = stages.indexOf(b.stage);
+  if (idx < stages.length - 1) {
+    const newStage = stages[idx + 1];
+    b.stage = newStage;
+    closeDetailModal();
+    renderView(currentView);
+    triggerStageAutomations(b, newStage);
+  }
+}
+
+/* ============ AUTOMATIONS / AUTOFLOW ============ */
+function triggerStageAutomations(b, stage) {
+  const now = new Date();
+  const timeStr = 'Just nu';
+
+  if (stage === 'bekraftad') {
+    showToast('mail', 'Bokningsbekräftelse skickad', `Mail till ${b.kontakt || 'butik'} + ${b.kund}`);
+    logRun('Bokningsbekräftelse', `${b.kontakt ? b.kontakt.toLowerCase() + '@' : ''}butik.se, ${b.kund.toLowerCase().split(' ')[0]}@kund.se`, `${b.butik} — ${b.dagar}`, 'mail', timeStr);
+    const a = AUTOMATIONS.find(x => x.id === 'a1'); if (a) { a.runs++; a.lastRun = 'Just nu'; }
+  }
+  else if (stage === 'personal') {
+    if (b.personal) {
+      showToast('message-square', 'SMS + kalenderinvite skickad', `Till ${b.personal} · Påminnelse 24h innan schemalagd`);
+      logRun('SMS + kalenderinvite', b.personal, `${b.butik} — ${b.dagar}`, 'sms', timeStr);
+      const a = AUTOMATIONS.find(x => x.id === 'a2'); if (a) { a.runs++; a.lastRun = 'Just nu'; }
+    }
+  }
+  else if (stage === 'aterrapporterad') {
+    showToast('send', 'Återrapport vidarebefordrad', `Mail till ${b.kund} med foto och försäljningssiffror`);
+    showToast('receipt', 'Fakturaunderlag skapat i Fortnox', `${b.butik} — redo för granskning`);
+    logRun('Återrapport → uppdragsgivare', `${b.kund.toLowerCase().split(' ')[0]}@kund.se`, `${b.butik} — återrapport`, 'mail', timeStr);
+    logRun('Fakturaunderlag till Fortnox', `Fortnox (${b.kund})`, `${b.butik} — ${(b.timmar * 495).toLocaleString('sv-SE')} kr`, 'fortnox', timeStr);
+    const a1 = AUTOMATIONS.find(x => x.id === 'a4'); if (a1) { a1.runs++; a1.lastRun = 'Just nu'; }
+    const a2 = AUTOMATIONS.find(x => x.id === 'a5'); if (a2) { a2.runs++; a2.lastRun = 'Just nu'; }
+  }
+}
+
+function showToast(iconName, title, msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `
+    <div class="toast-icon"><svg class="icon-sm"><use href="#i-${iconName}"/></svg></div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      <div class="toast-msg">${msg}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.classList.add('removing'); setTimeout(()=>this.parentElement.remove(), 200);"><svg class="icon-sm"><use href="#i-x"/></svg></button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 200);
+    }
+  }, 5500);
+}
+
+function logRun(automation, target, details, type, time) {
+  ACTIVITY_LOG.unshift({
+    id: 'r' + (Date.now()),
+    time, automation, target, details, type,
+    isNew: true,
+  });
+}
+
+function toggleAutomation(id) {
+  const a = AUTOMATIONS.find(x => x.id === id);
+  if (a) {
+    a.enabled = !a.enabled;
+    renderView('automations');
+    showToast('zap', a.enabled ? 'Automation aktiverad' : 'Automation pausad', a.name);
+  }
+}
+
+function renderAutomations() {
+  const enabled = AUTOMATIONS.filter(a => a.enabled).length;
+  const totalRuns = AUTOMATIONS.reduce((s, a) => s + a.runs, 0);
+  const iconMap = { mail: 'mail', sms: 'message-square', calendar: 'calendar', fortnox: 'receipt', slack: 'message-square', ai: 'zap' };
+
+  return `
+    <div class="autoflow-hero">
+      <div class="autoflow-hero-text">
+        <h2><span class="brand-mark">SAMIFY AUTOFLOW™</span></h2>
+        <p>Automatiserade flöden som hanterar mail, SMS, kalenderinvites, Fortnox-underlag och Slack-notiser åt er — så att kontoret slipper pricka av varje steg manuellt. Slå av/på enskilda flöden när som helst.</p>
+      </div>
+      <div style="display:flex; gap:32px; position:relative; z-index:1;">
+        <div class="autoflow-hero-stat">
+          <div class="num">${enabled}<span style="opacity:0.5;">/${AUTOMATIONS.length}</span></div>
+          <div class="lbl">Aktiva flöden</div>
+        </div>
+        <div class="autoflow-hero-stat">
+          <div class="num">${totalRuns}</div>
+          <div class="lbl">Körningar totalt</div>
+        </div>
+        <div class="autoflow-hero-stat">
+          <div class="num">~${Math.round(totalRuns * 4 / 60)}h</div>
+          <div class="lbl">Sparad tid / månad</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="font-size:15px; font-weight:700; color:var(--ink); letter-spacing:-0.01em;">Flöden</h3>
+      <button class="btn btn-outline btn-sm" onclick="alert('Öppnar flödesbyggare... (kommande funktion)')">
+        ${icon('plus','icon-sm')} Nytt flöde
+      </button>
+    </div>
+
+    <div class="automation-grid">
+      ${AUTOMATIONS.map(a => `
+        <div class="automation-card ${a.enabled ? '' : 'off'}">
+          <div class="automation-head">
+            <div class="automation-icon">${icon(a.icon)}</div>
+            <div style="flex:1;">
+              <div class="automation-title">${a.name}</div>
+              <div class="automation-desc">${a.desc}</div>
+            </div>
+            <div class="toggle ${a.enabled ? 'on' : ''}" onclick="toggleAutomation('${a.id}')"></div>
+          </div>
+          <div class="flow-pill">
+            <span class="trigger">⚡ ${a.trigger}</span>
+            <span class="arrow">→</span>
+            ${a.actions.map(ac => `<span class="action">${icon(iconMap[ac.type] || 'zap','icon-sm')} ${ac.label}</span>`).join('<span class="arrow">+</span>')}
+          </div>
+          <div class="automation-stats">
+            <span class="automation-stat-text"><strong>${a.runs}</strong> körningar · Senast: ${a.lastRun}</span>
+            <button class="btn btn-ghost btn-sm" onclick="alert('Visar detaljerad historik för: ${a.name.replace(/'/g, '')}')">
+              ${icon('activity','icon-sm')} Historik
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" style="display:flex; align-items:center; gap:10px;">
+          ${icon('activity','icon-sm')} Körningslogg
+        </div>
+        <button class="btn btn-ghost btn-sm">Visa alla →</button>
+      </div>
+      <div style="padding: 8px 24px;">
+        <div class="activity-timeline">
+          ${ACTIVITY_LOG.slice(0, 8).map(r => `
+            <div class="activity-item ${r.isNew ? 'run-row-new' : ''}">
+              <div class="activity-dot"></div>
+              <div class="activity-content">
+                <div class="activity-main">${r.automation} — <span style="color:var(--ink-muted); font-weight:400;">${r.details}</span></div>
+                <div class="activity-meta">
+                  <span class="activity-chip">${icon(iconMap[r.type] || 'zap','icon-sm')} ${r.type}</span>
+                  <span>${r.time}</span>
+                  <span style="color:var(--ink-faint);">·</span>
+                  <span>${r.target}</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ BOOKING MODAL ============ */
+function openBookingModal() {
+  document.getElementById('bookingModalTitle').textContent = 'Nytt uppdrag';
+  ['f_butik','f_kontakt','f_tel','f_ort','f_dagar','f_timmar','f_kund','f_produkt','f_material','f_info'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bookingModal').classList.add('active');
+}
+function closeBookingModal() { document.getElementById('bookingModal').classList.remove('active'); }
+function saveBooking(stage) {
+  const nytt = {
+    id: 'b' + (BOKNINGAR.length + 1),
+    butik: document.getElementById('f_butik').value || 'Ny bokning',
+    kontakt: document.getElementById('f_kontakt').value, tel: document.getElementById('f_tel').value,
+    ort: document.getElementById('f_ort').value, region: document.getElementById('f_region').value,
+    dagar: document.getElementById('f_dagar').value,
+    timmar: parseFloat(document.getElementById('f_timmar').value) || 0,
+    kund: document.getElementById('f_kund').value, tjanst: document.getElementById('f_tjanst').value,
+    personal: document.getElementById('f_personal').value,
+    produkt: document.getElementById('f_produkt').value, material: document.getElementById('f_material').value,
+    info: document.getElementById('f_info').value,
+    stage: stage === 'draft' ? 'inkommen' : 'bokad',
+    anlagd: new Date().toISOString().slice(0,10),
+  };
+  BOKNINGAR.unshift(nytt);
+  closeBookingModal();
+  renderView(currentView);
+  if (stage !== 'draft') {
+    showToast('mail', 'Bokningsbekräftelse skickad', `Mail till ${nytt.kontakt || 'butik'} + ${nytt.kund}`);
+    logRun('Bokningsbekräftelse', `${(nytt.kontakt || 'butik').toLowerCase()}@butik.se`, `${nytt.butik} — ${nytt.dagar}`, 'mail', 'Just nu');
+    const a = AUTOMATIONS.find(x => x.id === 'a1'); if (a) { a.runs++; a.lastRun = 'Just nu'; }
+  }
+}
+
+/* ============ EXPORT ============ */
+function exportData() {
+  const rows = [['Datum','Butik','Ort','Kund','Tjänst','Personal','Timmar','Status','Produkt','Material','Info']];
+  BOKNINGAR.forEach(b => rows.push([b.dagar, b.butik, b.ort, b.kund, b.tjanst, b.personal||'', b.timmar, STAGE_META[b.stage].label, b.produkt||'', b.material||'', (b.info||'').replace(/\n/g,' ')]));
+  const csv = rows.map(r => r.map(c => `"${(c+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'crew2you-bokningar.csv';
+  a.click();
+}
+
+/* ============ PERSONAL (MOBILE) ============ */
+function setMobileTab(tab) {
+  document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('active', t.dataset.mtab === tab));
+  const el = document.getElementById('mobileContent');
+  if (tab === 'uppdrag') el.innerHTML = renderMobileUppdrag();
+  else if (tab === 'utlagg') el.innerHTML = renderMobileUtlagg();
+  else if (tab === 'aterrapport') el.innerHTML = renderMobileAterrapport();
+}
+
+function renderMobileUppdrag() {
+  const mina = BOKNINGAR.filter(b => b.personal === 'Lars Djupsjö');
+  const kommande = mina.filter(b => !['fakturerad'].includes(b.stage));
+  return `
+    <div style="font-size:11px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; font-weight:700;">Kommande uppdrag (${kommande.length})</div>
+    ${kommande.length ? kommande.map(b => `
+      <div class="m-uppdrag-card">
+        <div class="m-date-chip">${b.dagar}</div>
+        <div class="m-uppdrag-butik">${b.butik}</div>
+        <div class="m-uppdrag-ort">${icon('map-pin','icon-sm')} ${b.ort} · ${b.timmar} h</div>
+        <div class="m-uppdrag-info">
+          <div><strong>Kund:</strong> ${b.kund}</div>
+          <div><strong>Produkt:</strong> ${b.produkt || '–'}</div>
+          <div><strong>Material:</strong> ${b.material || '–'}</div>
+          ${b.info ? `<div><strong>Info:</strong> ${b.info}</div>` : ''}
+        </div>
+        <div class="m-uppdrag-actions">
+          <button class="btn btn-outline btn-sm" onclick="setMobileTab('utlagg')">${icon('wallet','icon-sm')} Utlägg</button>
+          <button class="btn btn-accent btn-sm" onclick="setMobileTab('aterrapport')">${icon('clipboard','icon-sm')} Rapportera</button>
+        </div>
+      </div>
+    `).join('') : `<div class="empty">${icon('inbox','icon-lg')}<div>Inga kommande uppdrag</div></div>`}
+  `;
+}
+
+function renderMobileUtlagg() {
+  const mina = UTLAGG.filter(u => u.person === 'Lars Djupsjö');
+  const totalt = mina.reduce((s, u) => s + u.belopp, 0);
+  return `
+    <div class="utlagg-total-card">
+      <div class="label">Mina utlägg denna månad</div>
+      <div class="value">${totalt.toLocaleString('sv-SE')} kr</div>
+      <div class="sub">${mina.length} registrerade</div>
+    </div>
+    <button class="btn btn-accent" style="width:100%; justify-content:center; margin-bottom:20px;" onclick="openUtlaggModal()">
+      ${icon('plus','icon-sm')} Registrera nytt utlägg
+    </button>
+    <div style="font-size:11px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; font-weight:700;">Historik</div>
+    ${mina.length ? mina.map(u => {
+      const b = BOKNINGAR.find(x => x.id === u.bokningId);
+      return `<div class="utlagg-item">
+        <div class="utlagg-item-info">
+          <h5>${u.typ} — ${u.beskrivning}</h5>
+          <p>${u.datum} · ${b ? b.butik : '–'}</p>
+        </div>
+        <div class="utlagg-amount">${u.belopp.toLocaleString('sv-SE')} kr</div>
+      </div>`;
+    }).join('') : `<div class="empty">${icon('wallet','icon-lg')}<div>Inga utlägg ännu</div></div>`}`;
+}
+
+function renderMobileAterrapport() {
+  const mina = BOKNINGAR.filter(b => b.personal === 'Lars Djupsjö' && ['genomford', 'personal', 'bekraftad'].includes(b.stage));
+  return `
+    <div style="font-size:11px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; font-weight:700;">Att återrapportera</div>
+    ${mina.length ? mina.map(b => `
+      <div class="m-uppdrag-card">
+        <div class="m-date-chip">${b.dagar}</div>
+        <div class="m-uppdrag-butik">${b.butik}</div>
+        <div class="m-uppdrag-ort">${icon('map-pin','icon-sm')} ${b.ort} · ${b.kund}</div>
+        <div style="margin-top:16px;">
+          <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px;">Hur gick demot?</label>
+          <textarea placeholder="Kort beskrivning — försäljning, kundrespons, synpunkter..." style="width:100%; padding:10px 12px; border:1px solid var(--border-strong); border-radius:var(--r); min-height:80px; font-family:inherit;"></textarea>
+        </div>
+        <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div><label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px;">Såld volym</label>
+            <input type="text" placeholder="Ex: 42 st" style="width:100%; padding:10px 12px; border:1px solid var(--border-strong); border-radius:var(--r);"></div>
+          <div><label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px;">Faktiska timmar</label>
+            <input type="number" placeholder="${b.timmar}" style="width:100%; padding:10px 12px; border:1px solid var(--border-strong); border-radius:var(--r);"></div>
+        </div>
+        <div style="margin-top:12px;">
+          <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px;">Foto från demon</label>
+          <button class="btn btn-outline" style="width:100%; justify-content:center;">${icon('camera','icon-sm')} Ta foto / välj från galleri</button>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="alert('Återrapport skickad ✓\\n\\nKontoret får notis + kunden får länk till rapport.')">
+          ${icon('send','icon-sm')} Skicka återrapport
+        </button>
+      </div>
+    `).join('') : `<div class="empty">${icon('check','icon-lg')}<div>Inga uppdrag att rapportera</div></div>`}
+  `;
+}
+
+function openUtlaggModal() {
+  const sel = document.getElementById('u_uppdrag');
+  sel.innerHTML = BOKNINGAR.filter(b => b.personal === 'Lars Djupsjö').map(b => `<option value="${b.id}">${b.butik} — ${b.dagar}</option>`).join('');
+  ['u_belopp','u_beskr'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('utlaggModal').classList.add('active');
+}
+function closeUtlaggModal() { document.getElementById('utlaggModal').classList.remove('active'); }
+function saveUtlagg() {
+  const nytt = {
+    id: 'u' + (UTLAGG.length + 1),
+    bokningId: document.getElementById('u_uppdrag').value,
+    person: 'Lars Djupsjö',
+    typ: document.getElementById('u_typ').value,
+    belopp: parseFloat(document.getElementById('u_belopp').value) || 0,
+    beskrivning: document.getElementById('u_beskr').value,
+    datum: new Date().toISOString().slice(0,10),
+  };
+  UTLAGG.push(nytt);
+  closeUtlaggModal();
+  setMobileTab('utlagg');
+  showToast('message-square', 'Slack-notis skickad', `#utlagg · ${nytt.person} registrerade ${nytt.belopp.toLocaleString('sv-SE')} kr`);
+  logRun('Slack-notis vid nya utlägg', 'Kanal #utlagg', `${nytt.person} registrerade ${nytt.belopp} kr (${nytt.typ.toLowerCase()})`, 'slack', 'Just nu');
+  const a = AUTOMATIONS.find(x => x.id === 'a6'); if (a) { a.runs++; a.lastRun = 'Just nu'; }
+}
+
+/* ============ KUND (CUSTOMER) ============ */
+function setKundView(view) {
+  document.querySelectorAll('#kundApp .nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === 'kund-' + view));
+  const el = document.getElementById('kundContent');
+  const titel = document.getElementById('kundPageTitle');
+  const minaBokningar = BOKNINGAR.filter(b => b.kund.toLowerCase().includes('falbygdens'));
+
+  if (view === 'oversikt') {
+    titel.textContent = 'Välkommen Falbygdens Ost';
+    const kommande = minaBokningar.filter(b => !['fakturerad','aterrapporterad'].includes(b.stage));
+    const genomforda = minaBokningar.filter(b => ['aterrapporterad','fakturerad'].includes(b.stage));
+    el.innerHTML = `
+      <div class="kund-hero">
+        <h2>Hej Jenny</h2>
+        <p>Ni har ${kommande.length} kommande uppdrag och ${genomforda.length} genomförda. Här är en snabb översikt.</p>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-head"><div class="kpi-label">Kommande uppdrag</div><div class="kpi-icon">${icon('calendar','icon-sm')}</div></div><div class="kpi-value">${kommande.length}</div></div>
+        <div class="kpi-card"><div class="kpi-head"><div class="kpi-label">Genomförda</div><div class="kpi-icon">${icon('check','icon-sm')}</div></div><div class="kpi-value">${genomforda.length}</div></div>
+        <div class="kpi-card"><div class="kpi-head"><div class="kpi-label">Totala timmar</div><div class="kpi-icon">${icon('clock','icon-sm')}</div></div><div class="kpi-value">${minaBokningar.reduce((s,b)=>s+(b.timmar||0),0)} <small>h</small></div></div>
+        <div class="kpi-card"><div class="kpi-head"><div class="kpi-label">Öppna fakturor</div><div class="kpi-icon">${icon('receipt','icon-sm')}</div></div><div class="kpi-value">1</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Kommande uppdrag</div><button class="btn btn-ghost btn-sm" onclick="setKundView('bokningar')">Se alla ${icon('arrow-right','icon-sm')}</button></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Datum</th><th>Butik</th><th>Ort</th><th>Demovärd</th><th>Status</th></tr></thead>
+            <tbody>
+              ${kommande.map(b => `<tr>
+                <td class="td-strong">${b.dagar}</td><td class="td-strong">${b.butik}</td><td class="td-muted">${b.ort}</td>
+                <td>${b.personal || '<span class="td-muted">Tillsätts</span>'}</td>
+                <td><span class="status-badge status-${b.stage}">${STAGE_META[b.stage].label}</span></td>
+              </tr>`).join('') || '<tr><td colspan="5" class="empty">Inga kommande uppdrag</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  } else if (view === 'bokningar') {
+    titel.textContent = 'Mina bokningar';
+    el.innerHTML = `
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Datum</th><th>Butik</th><th>Ort</th><th>Tjänst</th><th>Demovärd</th><th>Tim</th><th>Status</th></tr></thead>
+            <tbody>
+              ${minaBokningar.map(b => `<tr>
+                <td class="td-strong">${b.dagar}</td><td class="td-strong">${b.butik}</td><td class="td-muted">${b.ort}</td>
+                <td><span class="chip ${b.tjanst}">${b.tjanst}</span></td>
+                <td>${b.personal || '–'}</td><td>${b.timmar} h</td>
+                <td><span class="status-badge status-${b.stage}">${STAGE_META[b.stage].label}</span></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  } else if (view === 'rapporter') {
+    titel.textContent = 'Återrapporter';
+    const rapporterade = minaBokningar.filter(b => b.aterrapport);
+    el.innerHTML = rapporterade.length ? rapporterade.map(b => `
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div><div class="card-title">${b.butik}</div>
+            <div style="font-size:12.5px; color:var(--ink-muted); margin-top:3px;">${b.ort} · ${b.dagar} · ${b.personal}</div>
+          </div>
+          <span class="status-badge status-${b.stage}">${STAGE_META[b.stage].label}</span>
+        </div>
+        <div class="card-body">
+          <div style="background:var(--green-bg); padding:16px 18px; border-radius:var(--r); border: 1px solid #a7f3d0;">
+            <div style="font-weight:700; color: var(--green); margin-bottom: 8px; display:flex; align-items:center; gap:8px; font-size:13px;">
+              ${icon('clipboard','icon-sm')} Rapport från demovärd
+            </div>
+            <div style="color: var(--ink-soft); font-size:13.5px; line-height:1.6;">${b.aterrapport}</div>
+          </div>
+        </div>
+      </div>`).join('') : `<div class="empty">${icon('clipboard','icon-lg')}<div>Inga återrapporter ännu</div></div>`;
+  } else if (view === 'fakturor') {
+    titel.textContent = 'Fakturor';
+    el.innerHTML = `
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Fakturanr</th><th>Datum</th><th>Förfallodag</th><th style="text-align:right;">Belopp</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="td-strong">C2Y-2026-001</td><td class="td-muted">2026-01-15</td><td class="td-muted">2026-02-14</td><td style="text-align:right; font-weight:600;">4 997 kr</td><td><span class="status-badge status-aterrapporterad">Betald</span></td></tr>
+              <tr><td class="td-strong">C2Y-2026-002</td><td class="td-muted">2026-03-20</td><td class="td-muted">2026-04-19</td><td style="text-align:right; font-weight:600;">3 645 kr</td><td><span class="status-badge status-bokad">Öppen</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+}
+
+/* ============ INIT ============ */
+initLogos();
+</script>
+</body>
+</html>
